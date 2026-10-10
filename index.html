@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SymptomCheck – Before you go to the ER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5F4; --bg-alt:#E7EDEB; --ink:#10262B; --ink-soft:#3E5A5B;
+  --teal:#0E5C56; --teal-dark:#0A423E; --amber:#C9891F;
+  --card:#FFFFFF; --line:#D9E2E0;
+  --red:#C63A2E; --red-bg:#FBE9E7;
+  --orange:#D2691E; --orange-bg:#FCEEDD;
+  --yellow:#8A6D00; --yellow-bg:#FBF3D0;
+  --green:#1F7A4D; --green-bg:#E4F3E9;
+  --blue:#2456A6; --blue-bg:#E7EEFA;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1C1E; --bg-alt:#14262A; --ink:#EAF1EF; --ink-soft:#AFC4C2;
+    --teal:#4FBDAF; --teal-dark:#2E7F76; --amber:#E3A94A;
+    --card:#17282B; --line:#2A3E40;
+    --red-bg:#3A1F1C; --orange-bg:#3A2A16; --yellow-bg:#332C10; --green-bg:#173327; --blue-bg:#182A3F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1C1E; --bg-alt:#14262A; --ink:#EAF1EF; --ink-soft:#AFC4C2;
+  --teal:#4FBDAF; --teal-dark:#2E7F76; --amber:#E3A94A;
+  --card:#17282B; --line:#2A3E40;
+  --red-bg:#3A1F1C; --orange-bg:#3A2A16; --yellow-bg:#332C10; --green-bg:#173327; --blue-bg:#182A3F;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+body{margin:0; min-height:100%; background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif; line-height:1.5;}
+h1,h2,.display{font-family:'Fraunces',serif;}
+a{color:var(--teal);}
+
+#landing{padding:40px 20px 40px; max-width:1000px; margin:0 auto;}
+.badge{display:inline-flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 16px 6px 6px; margin-bottom:22px;}
+.badge span{font-size:0.82rem; font-weight:600; color:var(--ink-soft); letter-spacing:.01em;}
+.hero{display:grid; grid-template-columns:1.2fr 0.8fr; gap:40px; align-items:center;}
+@media (max-width:720px){ .hero{grid-template-columns:1fr;} }
+.eyebrow{color:var(--teal); font-weight:600; font-size:0.95rem; margin:0 0 10px;}
+h1.display{font-size:clamp(2.1rem,5vw,3.1rem); font-weight:700; line-height:1.08; margin:0 0 18px; color:var(--ink);}
+.hero p.lede{font-size:1.15rem; color:var(--ink-soft); max-width:54ch; margin:0 0 16px;}
+.hero p.lede2{font-size:1rem; color:var(--ink-soft); max-width:54ch; margin:0 0 28px;}
+.cta{appearance:none; border:none; cursor:pointer; font-family:'Inter'; font-weight:600; font-size:1.05rem; background:var(--teal); color:#fff; padding:14px 28px; border-radius:999px; box-shadow:0 6px 18px rgba(14,92,86,.28); transition:transform .15s ease, box-shadow .15s ease;}
+.cta:hover{transform:translateY(-1px); box-shadow:0 9px 22px rgba(14,92,86,.34);}
+.cta:focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+.hero-art{width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;}
+.how{margin:56px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+@media (max-width:720px){ .how{grid-template-columns:1fr;} }
+.how div{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px;}
+.how h3{margin:0 0 6px; font-size:1rem;}
+.how p{margin:0; color:var(--ink-soft); font-size:0.92rem;}
+
+#chat-screen{display:none; max-width:640px; margin:0 auto; padding:24px 16px 40px; min-height:100%;}
+.chat-top{display:flex; align-items:center; gap:10px; padding:6px 4px 18px; position:sticky; top:env(safe-area-inset-top,0px); background:var(--bg);}
+.chat-top .dot{width:10px; height:10px; border-radius:50%; background:var(--teal);}
+.chat-top span{font-weight:600; color:var(--ink-soft); font-size:0.95rem;}
+#thread{display:flex; flex-direction:column; gap:14px;}
+.bubble{background:var(--card); border:1px solid var(--line); border-radius:16px 16px 16px 4px; padding:14px 16px; max-width:88%; font-size:1rem;}
+.bubble p{margin:0 0 8px;} .bubble p:last-child{margin-bottom:0;}
+.options{display:flex; gap:10px; flex-wrap:wrap; margin-top:2px;}
+.opt-btn{appearance:none; cursor:pointer; border:1.5px solid var(--teal); background:transparent; color:var(--teal); font-family:'Inter'; font-weight:600; font-size:0.98rem; padding:10px 22px; border-radius:999px; transition:background .12s ease, color .12s ease;}
+.opt-btn:hover{background:var(--teal); color:#fff;}
+.opt-btn:focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+.user-echo{align-self:flex-end; background:var(--teal); color:#fff; border:none; border-radius:16px 16px 4px 16px;}
+
+.result{border-radius:16px; padding:20px 20px 22px; border:1.5px solid transparent;}
+.result h2{margin:0 0 10px; font-size:1.3rem;}
+.result.red{background:var(--red-bg); border-color:var(--red); color:var(--red);}
+.result.orange{background:var(--orange-bg); border-color:var(--orange); color:var(--orange);}
+.result.yellow{background:var(--yellow-bg); border-color:var(--yellow); color:var(--yellow);}
+.result.green{background:var(--green-bg); border-color:var(--green); color:var(--green);}
+.result.blue{background:var(--blue-bg); border-color:var(--blue); color:var(--blue);}
+.result .body{color:var(--ink); font-size:1rem;}
+.result .body p{margin:0 0 10px;}
+.phone{font-family:'Fraunces'; font-weight:700; font-size:1.3rem; letter-spacing:.02em; color:inherit; text-decoration:underline; text-underline-offset:3px;}
+.hotlines .num a{color:var(--teal); font-weight:700; text-decoration:underline; text-underline-offset:2px;}
+
+.appeal{background:var(--bg-alt); border:1.5px dashed var(--red); border-radius:14px; padding:16px 18px; font-size:0.96rem; color:var(--ink);}
+.appeal strong{color:var(--red);}
+
+.nearby{border:1.5px solid var(--orange); background:var(--orange-bg); border-radius:12px; padding:14px 16px; margin:12px 0 16px;}
+.nb-label{margin:0 0 8px; font-size:0.86rem; font-weight:700; color:var(--orange);}
+.nearby ul{margin:0; padding-left:18px; color:var(--ink); font-size:0.98rem;}
+.nearby li{margin-bottom:6px;}
+.nearby li.rec{font-weight:600;}
+.nearby .tag{display:inline-block; margin-left:8px; background:var(--teal); color:#fff; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:999px; vertical-align:middle;}
+.nb-fine{margin:8px 0 0; font-size:0.76rem; font-style:italic; font-weight:400; color:var(--ink-soft);}
+.waitbox{border:1.5px solid var(--red); background:var(--red-bg); border-radius:12px; padding:14px 16px; margin:12px 0 16px;}
+.wt-label{margin:0 0 8px; font-size:0.86rem; font-weight:700; color:var(--red);}
+.waitbox ul{margin:0; padding-left:18px; color:var(--red); font-weight:700; font-size:1.05rem;}
+.waitbox li{margin-bottom:5px;}
+.wt-fine{margin:8px 0 0; font-size:0.76rem; font-style:italic; font-weight:400; color:var(--ink-soft);}
+.hotlines{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:14px 0;}
+.hotlines table{width:100%; border-collapse:collapse; font-size:0.94rem;}
+.hotlines td{padding:6px 4px; border-top:1px solid var(--line);}
+.hotlines tr:first-child td{border-top:none;}
+.hotlines .num{font-weight:700; text-align:right;}
+.appeal-inline{font-size:0.92rem; color:var(--red); font-weight:500;}
+.recommend{background:var(--card); border-left:4px solid var(--green); padding:10px 14px; border-radius:6px; font-size:1.02rem;}
+.result.blue .recommend{border-left-color:var(--blue);}
+.norm{background:var(--bg-alt); border-radius:10px; padding:10px 14px; font-size:0.92rem; color:var(--ink-soft);}
+
+.restart{margin-top:18px; background:none; border:1.5px solid var(--line); color:var(--ink); border-radius:999px; padding:10px 20px; font-weight:600; cursor:pointer; font-family:'Inter';}
+.restart:hover{border-color:var(--teal); color:var(--teal);}
+
+.footnote{font-size:0.72rem; color:var(--ink-soft); margin-top:34px; text-align:center; opacity:.75;}
+
+.options.scale{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:8px;}
+.scale-btn{padding:10px 0; text-align:center;}
+.scale-btn[data-n="0"]{grid-column:1/-1;}
+.scale-hint{margin:10px 0 0; font-size:0.8rem; color:var(--ink-soft);}
+
+/* ----- Nudge blocks ----- */
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0 6px;}
+.cmp{border-radius:12px; padding:12px 12px 10px; display:flex; flex-direction:column; gap:2px; border:1.5px solid;}
+.cmp.er{background:var(--red-bg); border-color:var(--red); color:var(--red);}
+.cmp.dr{background:var(--green-bg); border-color:var(--green); color:var(--green);}
+.cmp-h{font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em;}
+.cmp-t{font-family:'Fraunces',serif; font-weight:700; font-size:1.55rem; line-height:1.15;}
+.cmp-s{font-size:0.78rem; color:var(--ink-soft);}
+.cmp-save{margin:6px 0 12px !important; font-size:0.95rem;}
+
+.actions,.safety{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 14px 12px; margin:14px 0;}
+.act-label,.sf-label{margin:0 0 10px !important; font-weight:700; font-size:0.9rem; color:var(--ink);}
+.act{display:block; width:100%; text-align:left; appearance:none; cursor:pointer; font-family:'Inter'; font-weight:600; font-size:0.96rem; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; margin:0 0 8px; transition:border-color .12s ease, background .12s ease;}
+.act:hover{border-color:var(--teal);}
+.act:focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+.act.primary{background:var(--teal); border-color:var(--teal); color:#fff;}
+.act.primary:hover{background:var(--teal-dark);}
+.act.commit{border-color:var(--teal); color:var(--teal);}
+.act.warn{border-color:var(--red); color:var(--red);}
+.act.done,.act:disabled{opacity:.7; cursor:default;}
+.doc-carousel-wrap{display:flex; align-items:stretch; gap:6px; margin:0 0 6px;}
+.doc-carousel{display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding:2px; flex:1; scrollbar-width:thin;}
+.doc-card{flex:0 0 auto; width:190px; scroll-snap-align:start; border:1.5px solid var(--line); border-radius:12px; padding:12px; background:var(--bg); position:relative;}
+.doc-card.earliest{border-color:var(--teal);}
+.doc-card.picked{border-color:var(--green); background:var(--green-bg);}
+.doc-tag{position:absolute; top:-9px; left:10px; background:var(--teal); color:#fff; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:999px;}
+.doc-name{margin:6px 0 0; font-weight:700; font-size:0.94rem;}
+.doc-clinic{margin:2px 0 8px; font-size:0.8rem; color:var(--ink-soft);}
+.doc-when{margin:0 0 10px; font-weight:600; font-size:0.92rem;}
+.doc-select{margin:0; padding:9px 10px; font-size:0.88rem; text-align:center;}
+.car-nav{flex:0 0 auto; width:32px; border:1.5px solid var(--line); background:var(--card); border-radius:999px; cursor:pointer; font-size:1.1rem; color:var(--ink); align-self:center;}
+.car-nav:hover{border-color:var(--teal); color:var(--teal);}
+.doc-note{font-size:0.78rem; color:var(--ink-soft); margin:0 0 10px; font-style:italic;}
+.call-hint{font-size:0.88rem; color:var(--ink); background:var(--bg-alt); border-radius:10px; padding:10px 12px; margin:0 0 12px;}
+.act-feedback{font-size:0.92rem; color:var(--ink); margin-top:4px;}
+.act-feedback:empty{display:none;}
+.act-feedback{background:var(--green-bg); border-left:4px solid var(--green); border-radius:6px; padding:10px 12px;}
+.sf-intro{margin:0 0 6px !important; font-size:0.93rem;}
+.safety ul{margin:0 0 12px; padding-left:20px; font-size:0.92rem; color:var(--ink);}
+.safety li{margin-bottom:3px;}
+.safety a{color:var(--red); font-weight:700;}
+@media (max-width:420px){ .compare{grid-template-columns:1fr;} }
+.typebar{display:flex; gap:8px; margin-top:18px; position:sticky; bottom:env(safe-area-inset-bottom,0px); background:var(--bg); padding:8px 0 2px;}
+.typebar input{flex:1; border:1.5px solid var(--line); background:var(--card); color:var(--ink); border-radius:999px; padding:12px 16px; font-family:'Inter'; font-size:0.98rem;}
+.typebar input:focus-visible{outline:2px solid var(--teal); outline-offset:1px;}
+.typebar button{appearance:none; border:none; cursor:pointer; background:var(--teal); color:#fff; font-weight:600; font-family:'Inter'; padding:12px 22px; border-radius:999px;}
+.typebar button:hover{background:var(--teal-dark);}
+.typebar-note{font-size:0.76rem; color:var(--ink-soft); text-align:center; margin:4px 0 0;}
+</style>
+</head>
+<body>
+
+<div id="landing">
+  <div class="badge" aria-hidden="true">
+    <svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="13" fill="var(--teal)"/><path d="M13 6v14M6 13h14" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+    <span>Community Care Initiative &middot; Public Health Notice</span>
+  </div>
+  <div class="hero">
+    <div>
+      <p class="eyebrow">Check your symptoms first</p>
+      <h1 class="display">Read this. Then decide where to go.</h1>
+      <p class="lede">A short, honest check can tell you whether you need the emergency room right now, a quick call to your doctor, or just some rest at home. It takes about two minutes — a few yes/no questions, nothing more.</p>
+      <p class="lede2">Answer for yourself, and honestly: it's the only way this actually helps you get to the right place.</p>
+      <button class="cta" onclick="startChat()">Check my symptoms</button>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 300 300" width="100%" height="100%">
+        <circle cx="150" cy="150" r="140" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+        <path d="M40 150 H100 L120 100 L150 200 L170 130 L185 150 H260" fill="none" stroke="var(--teal)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="150" cy="150" r="140" fill="none" stroke="var(--teal)" stroke-width="2" stroke-dasharray="2 10" opacity="0.5"/>
+        <g><rect x="95" y="205" width="110" height="52" rx="18" fill="var(--teal)"/><path d="M120 257 L112 275 L138 257 Z" fill="var(--teal)"/><circle cx="128" cy="231" r="6" fill="#fff"/><circle cx="150" cy="231" r="6" fill="#fff"/><circle cx="172" cy="231" r="6" fill="#fff"/></g>
+      </svg>
+    </div>
+  </div>
+  <div class="how">
+    <div><h3>1. Quick check</h3><p>A handful of targeted yes/no questions about your symptoms.</p></div>
+    <div><h3>2. Clear reading</h3><p>Red, Orange, Yellow, Green or Blue — the same scale hospitals use.</p></div>
+    <div><h3>3. The right place</h3><p>Ambulance, ER, or your local doctor — not the ER by default.</p></div>
+  </div>
+  <p class="footnote">Class project prototype for a Behavioural Economics course. Not a real medical device. In a genuine emergency, always call your local emergency number.</p>
+</div>
+
+<div id="chat-screen">
+  <div class="chat-top">
+    <svg width="20" height="20" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="13" fill="var(--teal)"/><path d="M13 6v14M6 13h14" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+    <span>SymptomCheck &middot; Community Care Initiative</span>
+  </div>
+  <div id="thread"></div>
+  <div class="typebar">
+    <input type="text" id="freetext" placeholder="Or describe your symptoms in your own words…" autocomplete="off">
+    <button id="sendBtn" onclick="submitFreetext()">Send</button>
+  </div>
+  <p class="typebar-note">Keyword-based demo check &mdash; less reliable than the questions above. If in doubt, use the buttons instead.</p>
+</div>
+
+<script>
+const Q = [
+  {id:'r1', level:'red', text:'Are you struggling to breathe?'},
+  {id:'r2', level:'red', text:'Do you have sudden, severe chest pain or tightness?'},
+  {id:'r3', level:'red', text:'Do you have heavy bleeding that won\'t stop?'},
+  {id:'r4', level:'red', text:'Do you have sudden weakness on one side, slurred speech, or a seizure?'},
+  {id:'pain', type:'scale', text:'On a scale from 1 to 10, how strong is your pain right now?'},
+  {id:'o1', level:'orange', text:'Is your pain unbearable?', cond:()=>pain>=8},
+  {id:'o2', level:'orange', text:'Are you suddenly confused or unusually drowsy?'},
+  {id:'o3', level:'orange', text:'Do you have a very high fever, or feel dangerously cold?'},
+  {id:'y1', level:'yellow', text:'Has your pain lasted a while without getting better?', cond:()=>pain>=4},
+  {id:'y2', level:'yellow', text:'Have you been vomiting for hours, or did you briefly pass out?'},
+  {id:'y3', level:'yellow', text:'Do you have an injury that may need stitches or an X-ray?'},
+  {id:'g1', level:'green', text:'Is this a mild problem that only started recently?'},
+  {id:'g2', level:'green', text:'Do you have a mild fever but otherwise feel stable?'},
+  {id:'g3', level:'green', text:'Is this something you\'d normally book a routine appointment for?'},
+];
+let pain = 0;
+
+const APPEAL = "<strong>One important thing before we continue: please answer honestly.</strong> Emergency departments have to stay free for people whose lives are genuinely at risk right now &mdash; a heart attack, a stroke, a severe accident. If you exaggerate your symptoms to get seen faster, you can push back someone else's care, and that delay can cost them their life. This isn't about you being judged &mdash; it's about the person in the next bed who really can't wait. Please answer for how you actually feel.";
+
+const thread = document.getElementById('thread');
+let idx = 0;
+let appealShown = false;
+
+function startChat(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('chat-screen').style.display='block';
+  bubble("Let's check your symptoms together, so we can point you to the right kind of help quickly.");
+  askNext();
+}
+
+function bubble(html, cls=''){
+  const d = document.createElement('div');
+  d.className = 'bubble ' + cls;
+  d.innerHTML = html;
+  thread.appendChild(d);
+  d.scrollIntoView({behavior:'smooth', block:'end'});
+  return d;
+}
+
+function askNext(){
+  while(idx < Q.length && Q[idx].cond && !Q[idx].cond()) idx++;
+  if(idx >= Q.length){ showResult('blue'); return; }
+  const q = Q[idx];
+  if(q.level === 'orange' && !appealShown){
+    appealShown = true;
+    bubble(APPEAL, 'appeal');
+  }
+  if(q.type === 'scale'){ askScale(q); return; }
+  const b = bubble('<p>'+q.text+'</p><div class="options"><button class="opt-btn" data-a="yes">Yes</button><button class="opt-btn" data-a="no">No</button></div>');
+  b.querySelectorAll('.opt-btn').forEach(btn=>{ btn.addEventListener('click', ()=>answer(q, btn.dataset.a, b)); });
+}
+
+function askScale(q){
+  let btns = '<button class="opt-btn scale-btn" data-n="0">No pain</button>';
+  for(let i=1;i<=10;i++) btns += '<button class="opt-btn scale-btn" data-n="'+i+'">'+i+'</button>';
+  const b = bubble('<p>'+q.text+'</p><div class="options scale">'+btns+'</div><p class="scale-hint">1 = barely noticeable &middot; 5 = distracting, but you can still do things &middot; 10 = the worst pain you can imagine</p>');
+  b.querySelectorAll('.scale-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      b.querySelectorAll('.scale-btn').forEach(x=>x.disabled=true);
+      pain = parseInt(btn.dataset.n,10);
+      bubble(pain===0 ? 'No pain' : String(pain), 'user-echo');
+      idx++;
+      if(pain>=8){
+        setTimeout(()=>{ bubble('Quick calibration: 10 is the worst pain you can imagine. Most people can still talk and move around at 7&ndash;8.'); setTimeout(askNext,350); }, 250);
+      } else setTimeout(askNext, 250);
+    });
+  });
+}
+
+function answer(q, val, bubbleEl){
+  bubbleEl.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  bubble(val==='yes' ? 'Yes' : 'No', 'user-echo');
+  if(val==='yes'){ showResult(q.level); return; }
+  idx++;
+  setTimeout(askNext, 250);
+}
+
+function waitNote(){
+  return `<div class="compare" role="group" aria-label="Time comparison">
+    <div class="cmp er"><span class="cmp-h">Emergency room</span><span class="cmp-t">&asymp; 5 h 40 min</span><span class="cmp-s">wait for non-urgent cases</span></div>
+    <div class="cmp dr"><span class="cmp-h">Doctor's line</span><span class="cmp-t">&asymp; 5 min</span><span class="cmp-s">until you speak to a professional</span></div>
+  </div>
+  <p class="cmp-save">Choosing the doctor's line gets you help <strong>more than 5 hours sooner</strong>.</p>
+  <div class="waitbox">
+    <p class="wt-label">Current ER wait times for non-urgent cases in Lisbon</p>
+    <ul>
+      <li>Hospital Central do Restelo &ndash; approx. 5 hrs 40 min</li>
+      <li>Hospital de Campo de Ourique &ndash; approx. 4 hrs 15 min</li>
+      <li>Hospital do Parque das Nações &ndash; approx. 6 hrs 10 min</li>
+    </ul>
+    <p class="wt-fine">(example figures, fictional hospitals)</p>
+  </div>`;
+}
+
+/* ---------- Nudge building blocks for Green / Blue ---------- */
+function fmtTime(d){ return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+function fmtDate(d){ return d.toLocaleDateString([], {weekday:'short', day:'numeric', month:'short'}); }
+function inDays(days, hour, minute){
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, minute, 0, 0);
+  return d;
+}
+
+/* Fictional doctors, deliberately uneven (1-2 days out, never today) to
+   reflect real heterogeneity: not every local health centre offers the
+   same fast-booking options, so wait varies doctor to doctor. */
+const DOCTORS = [
+  {name:'Dr. Sofia Mendes', clinic:'Clínica Alfama Saúde', when: inDays(2, 9, 30)},
+  {name:'Dr. Beatriz Lopes', clinic:'Clínica Campo de Ourique', when: inDays(2, 16, 15)},
+  {name:'Dr. Tiago Nunes', clinic:'Centro de Saúde dos Olivais', when: inDays(3, 8, 45)},
+  {name:'Dr. João Pinheiro', clinic:'Centro de Saúde do Restelo', when: inDays(3, 11, 0)},
+];
+const EARLIEST_DOC = DOCTORS.reduce((best,d,i,arr)=> d.when < arr[best].when ? i : best, 0);
+
+function doctorCarousel(){
+  const cards = DOCTORS.map((doc,i)=>{
+    const earliest = i === EARLIEST_DOC;
+    return `<div class="doc-card${earliest?' earliest':''}" data-i="${i}">
+      ${earliest?'<span class="doc-tag">Earliest available</span>':''}
+      <p class="doc-name">${doc.name}</p>
+      <p class="doc-clinic">${doc.clinic}</p>
+      <p class="doc-when">${fmtDate(doc.when)} &middot; ${fmtTime(doc.when)}</p>
+      <button class="act primary doc-select" onclick="confirmDoctor(${i})">Book this slot</button>
+    </div>`;
+  }).join('');
+  return `<div class="doc-carousel-wrap">
+    <button class="car-nav prev" onclick="scrollDocs(-1)" aria-label="Previous doctor">&#8249;</button>
+    <div class="doc-carousel" id="docCarousel">${cards}</div>
+    <button class="car-nav next" onclick="scrollDocs(1)" aria-label="Next doctor">&#8250;</button>
+  </div>
+  <p class="doc-note">Availability isn't the same everywhere &mdash; some health centres offer faster booking than others depending on where you live. Scroll to compare and pick the earliest slot.</p>
+  <p class="call-hint">📞 <strong>Prefer to talk today?</strong> You can also just call the practice directly to describe your symptoms &mdash; they can often advise you over the phone or fit you in sooner than the slots shown here.</p>`;
+}
+
+/* Nudge 1 (friction) + Nudge 2 (commitment): one-tap actions */
+function actionsBox(){
+  return `<div class="actions">
+    <p class="act-label">The easy way: pick the earliest doctor</p>
+    ${doctorCarousel()}
+    <div class="act-feedback carousel-fb" aria-live="polite"></div>
+    <button class="act" onclick="startTele(this)">💬 Start a telehealth call now</button>
+    <button class="act commit" onclick="commitCall(this)">✅ I'll call my doctor now</button>
+    <div class="act-feedback" aria-live="polite"></div>
+  </div>`;
+}
+
+/* Nudge 3: safety net against fear of missing something */
+function safetyNet(){
+  return `<div class="safety">
+    <p class="sf-label">🛟 Your safety net: waiting is safe if you watch for these signs</p>
+    <p class="sf-intro">If <strong>any</strong> of these appear, call <a href="tel:112">112</a> or go to the ER right away:</p>
+    <ul>
+      <li>Trouble breathing or chest pain/pressure</li>
+      <li>Confusion, unusual drowsiness, or fainting</li>
+      <li>Pain that gets rapidly worse or becomes severe</li>
+      <li>Heavy bleeding that won't stop</li>
+      <li>Sudden weakness on one side or slurred speech</li>
+    </ul>
+    <div class="sf-btns">
+      <button class="act" onclick="setReminder(this)">⏰ Remind me in 2 hours to check in</button>
+      <button class="act warn" onclick="gotWorse()">⚠️ My symptoms are getting worse</button>
+    </div>
+    <div class="act-feedback" aria-live="polite"></div>
+  </div>`;
+}
+
+function fb(el){ return el.closest('.actions, .safety').querySelector('.act-feedback'); }
+function scrollDocs(dir){
+  const track = document.getElementById('docCarousel');
+  if(!track) return;
+  const card = track.querySelector('.doc-card');
+  const step = card ? card.offsetWidth + 12 : 200;
+  track.scrollBy({left: dir*step, behavior:'smooth'});
+}
+function confirmDoctor(i){
+  const doc = DOCTORS[i];
+  const wrap = document.getElementById('docCarousel');
+  wrap.querySelectorAll('.doc-card').forEach(c=>c.classList.remove('picked'));
+  wrap.querySelector(`.doc-card[data-i="${i}"]`).classList.add('picked');
+  const box = wrap.closest('.actions');
+  box.querySelector('.carousel-fb').innerHTML = `<strong>Booked with ${doc.name}</strong> (${doc.clinic}) on ${fmtDate(doc.when)} at ${fmtTime(doc.when)}. A confirmation would be sent to you by SMS. That's still well before the ER wait time above.`;
+}
+function startTele(btn){
+  fb(btn).innerHTML = `<strong>Connecting you to a nurse&hellip;</strong> Expected wait: about 5 minutes. Stay on this page or keep your phone nearby.`;
+}
+function commitCall(btn){
+  btn.disabled = true; btn.classList.add('done');
+  btn.innerHTML = '✅ You\'re calling your doctor';
+  fb(btn).innerHTML = `<strong>Great choice.</strong> Thank you for keeping the ER free for people who need it. If it gets worse, come back here.`;
+}
+function setReminder(btn){
+  const t = fmtTime(new Date(Date.now() + 120*60000));
+  btn.disabled = true; btn.classList.add('done');
+  fb(btn).innerHTML = `<strong>Reminder set for ${t}.</strong> We'll ask how you're doing. Until then, keep an eye on the warning signs above.`;
+}
+function gotWorse(){ restart(); }
+
+function nearbyBox(items){
+  const lis = items.map(h => h.rec
+    ? `<li class="rec"><strong>${h.name}</strong> &ndash; ${h.dist} &middot; ~${h.wait} wait<span class="tag">Best fit for your symptoms &amp; current wait</span></li>`
+    : `<li>${h.name} &ndash; ${h.dist} &middot; ~${h.wait} wait</li>`
+  ).join('');
+  return `<div class="nearby">
+    <p class="nb-label">Based on your location, hospitals near you</p>
+    <ul>${lis}</ul>
+    <p class="nb-fine">Example data for this prototype (fictional hospitals, not real facilities or live wait times).</p>
+  </div>`;
+}
+
+function hotlineBox(){
+  return `<div class="hotlines"><table>
+    <tr><td>🇩🇪 Germany &ndash; non-emergency doctor line (ärztlicher Bereitschaftsdienst)</td><td class="num"><a href="tel:116117">116 117</a></td></tr>
+    <tr><td>🇫🇷 France &ndash; SAMU / medical advice</td><td class="num"><a href="tel:15">15</a></td></tr>
+    <tr><td>🇵🇹 Portugal &ndash; SNS 24 health line</td><td class="num"><a href="tel:808242424">808 24 24 24</a></td></tr>
+  </table></div>`;
+}
+
+const RESULTS = {
+  red: {cls:'red', title:'🔴 Emergency &ndash; act now', body:
+    `<p><strong>Call an ambulance right now: <a class="phone" href="tel:112">112</a>.</strong></p>
+     <p>Get someone else's attention so a person can stay with you until the ambulance arrives.</p>`},
+  orange: {cls:'orange', title:'🟠 Urgent', body:
+    `<p>Your answers point to an urgent case. Please go to a hospital emergency room now.</p>
+     ${nearbyBox([
+        {name:'Hospital Central do Restelo', dist:'1.8 km', wait:'25 min', rec:true},
+        {name:'Hospital de Campo de Ourique', dist:'3.4 km', wait:'50 min', rec:false},
+        {name:'Hospital do Parque das Nações', dist:'6.1 km', wait:'1 hr 05 min', rec:false}
+     ])}
+     <p class="appeal-inline">Please be honest with the staff there too &mdash; it helps them treat everyone in the right order.</p>`},
+  yellow: {cls:'yellow', title:'🟡 Needs treatment soon', body:
+    `<p>Your answers point to something that needs treatment. Please go to a hospital emergency room.</p>
+     ${nearbyBox([
+        {name:'Hospital de Campo de Ourique', dist:'2.9 km', wait:'55 min', rec:true},
+        {name:'Hospital Central do Restelo', dist:'1.8 km', wait:'1 hr 30 min', rec:false},
+        {name:'Hospital do Parque das Nações', dist:'6.1 km', wait:'45 min', rec:false}
+     ])}
+     <p class="appeal-inline">Please be honest with the staff there too &mdash; it helps them treat everyone in the right order.</p>`},
+  green: {cls:'green', title:'🟢 Not an emergency', body:
+    `<p>Based on your answers, this doesn't look like an emergency.</p>
+     <p class="recommend"><strong>Our recommendation: skip the ER for this. Call your doctor instead.</strong></p>
+     ${waitNote()}
+     ${actionsBox()}
+     <p><strong>Why a doctor is the better choice:</strong> local doctors know your history, aren't rushed, and are set up exactly for cases like this &mdash; the ER is built for critical, life-threatening problems. A pharmacist can help too.</p>
+     ${safetyNet()}
+     ${hotlineBox()}
+     <p class="norm">8 out of 10 people with similarly mild symptoms said calling their doctor first fully resolved the issue without an ER visit <span class="wt-fine">(example figure)</span>.</p>
+     <p class="appeal-inline">Please be honest with yourself here. Going to the ER with mild symptoms takes a bed and staff time away from someone whose life may depend on it &mdash; and you'll likely wait the longest of anyone in the room.</p>`},
+  blue: {cls:'blue', title:'🔵 Low urgency', body:
+    `<p>Based on your answers, you likely don't need the ER right now.</p>
+     <p class="recommend"><strong>Our recommendation: skip the ER for this. Call your doctor instead.</strong></p>
+     ${waitNote()}
+     ${actionsBox()}
+     <p><strong>Why a doctor is the better choice:</strong> a call to your family doctor, a pharmacist, or a telehealth line is usually enough &mdash; and often faster and more thorough than an ER visit for this kind of issue. They have more time and know your history.</p>
+     ${safetyNet()}
+     ${hotlineBox()}
+     <p class="norm">9 out of 10 people with similarly low-urgency symptoms said their doctor or pharmacist handled it well without an ER visit <span class="wt-fine">(example figure)</span>.</p>
+     <p class="appeal-inline">Please be honest with yourself here. Going to the ER with mild symptoms takes a bed and staff time away from someone whose life may depend on it &mdash; and you'll likely wait the longest of anyone in the room.</p>`}
+};
+
+function showResult(level){
+  const r = RESULTS[level];
+  const box = bubble('', 'result ' + r.cls);
+  box.innerHTML = `<h2>${r.title}</h2><div class="body">${r.body}</div><button class="restart" onclick="restart()">Start over</button>`;
+  box.style.maxWidth = '100%';
+}
+
+const KEYWORDS = {
+  red: ['can\'t breathe','cant breathe','difficulty breathing','trouble breathing','not breathing','chest pain','chest tightness','unconscious','unresponsive','won\'t stop bleeding','wont stop bleeding','heavy bleeding','severe bleeding','seizure','stroke','slurred speech','can\'t speak','cant speak','face drooping','one side of the body'],
+  orange: ['unbearable pain','excruciating','severe pain','very confused','confused','only responds to pain','very high fever','hypothermia','dangerously cold','hot and flushed'],
+  yellow: ['vomiting','threw up','thrown up','moderate pain','passed out','fainted','stitches','x-ray','xray','broken bone','fracture'],
+  green: ['mild pain','slight fever','low fever','small cut','minor rash','rash','cold symptoms','runny nose','sore throat','mild cough']
+};
+
+function classifyFreetext(text){
+  const t = text.toLowerCase();
+  for(const level of ['red','orange','yellow','green']){
+    if(KEYWORDS[level].some(k => t.includes(k))) return level;
+  }
+  return null;
+}
+
+function submitFreetext(){
+  const input = document.getElementById('freetext');
+  const text = input.value.trim();
+  if(!text) return;
+  bubble(text, 'user-echo');
+  input.value = '';
+  const level = classifyFreetext(text);
+  if(!level){
+    bubble("I couldn't confidently match that to a category from a fixed keyword list &mdash; that's a limit of this quick demo. Please use the guided Yes/No questions above instead, so nothing important gets missed.");
+    return;
+  }
+  bubble("Thanks &mdash; based on keywords in what you wrote, here's my read:");
+  showResult(level);
+}
+
+document.getElementById('freetext') && document.getElementById('freetext').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') submitFreetext();
+});
+
+document.addEventListener('keydown', function(e){
+  const chatVisible = document.getElementById('chat-screen').style.display === 'block';
+  if(!chatVisible) return;
+  if(e.target && e.target.tagName === 'INPUT') return;
+  const jump = {'1':'red','2':'orange','3':'yellow','4':'green','5':'blue'};
+  if(jump[e.key]) showResult(jump[e.key]);
+});
+
+function restart(){
+  thread.innerHTML = '';
+  idx = 0; appealShown = false; pain = 0;
+  bubble("Let's check your symptoms together, so we can point you to the right kind of help quickly.");
+  askNext();
+}
+</script>
+</body>
+</html>
